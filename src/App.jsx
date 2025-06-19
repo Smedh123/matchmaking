@@ -12,7 +12,6 @@ function App() {
     const fetchData = async () => {
       try {
         const properties = await fetchProperties();
-        console.log("Fetched properties:", properties);
         setProperties(properties);
       } catch (err) {
         console.error("Error fetching properties:", err);
@@ -22,27 +21,29 @@ function App() {
   }, []);
 
   const Matching = (requirement) => {
-    const matches = properties
-      .map((property) => {
-        const score = getMatchScore(requirement, property);
-        return score !== null
-          ? {
-              id: property.id,
-              assetType: property.assetType || "Unknown",
-              score,
-            }
-          : null;
-      })
-      .filter(Boolean);
+  const matches = properties
+    .map((property) => {
+      const scoreResult = getMatchScore(requirement, property);
+      return scoreResult !== null
+        ? {
+            id: property.id,
+            score: scoreResult.total,
+            breakdown: scoreResult.breakdown,
+            actualScore: scoreResult.actualScore,
+            possibleScore: scoreResult.possibleScore,
+          }
+        : null;
+    })
+    .filter(Boolean);
 
-    const sorted = matches.sort((a, b) => b.score - a.score).slice(0, 50); // Limit to top 50
+  const sorted = matches.sort((a, b) => b.score - a.score).slice(0, 50);
 
-    setRankedMatches(sorted);
-  };
+  setRankedMatches(sorted);
+};
 
-
-  const handleClick = async (id) => {
-    const property = await fetchPropertyById(id);
+  const handleClick = async (match) => {
+    console.log("Match details:", match);
+    const property = await fetchPropertyById(match.id);
     console.log("Clicked property:", property);
   };
 
@@ -58,13 +59,12 @@ function App() {
             {rankedMatches.map((match) => (
               <li
                 key={match.id}
-                onClick={() => handleClick(match.id)}
-                className="border p-3 rounded cursor-pointer hover:bg-gray-100"
+                onClick={() => handleClick(match)}
+                className="border p-3 rounded cursor-pointer hover:border-gray-500"
               >
                 <div className="font-medium">
-                  🏷️ {match.assetType} — 🔢 Score: {match.score.toFixed(2)}
+                  🏷️ {match.id} — 🔢 Score: {match.score.toFixed(2)}
                 </div>
-                <div className="text-sm text-gray-600">ID: {match.id}</div>
               </li>
             ))}
           </ul>

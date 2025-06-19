@@ -22,7 +22,6 @@ export const fetchProperties = async () => {
 
     });
 
-    console.log('Normalized properties:', userData);
     return userData;
   } catch (err) {
     console.error('Error fetching properties:', err);

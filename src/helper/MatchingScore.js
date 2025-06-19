@@ -83,63 +83,66 @@ export async function getLocationScore(reqLocationName, propLat, propLng) {
 export function getMatchScore(requirement, property) {
   let actualScore = 0;
   let possibleScore = 0;
+  const breakdown = {};
 
   // Price
-  if (requirement.priceMin && requirement.priceMax && property.price) {
+  if (requirement.priceMin && requirement.priceMax) {
+    if (property.price == null) return null; // Reject: required, but missing
     const score = getPriceScore(requirement.priceMin, requirement.priceMax, property.price);
-    if (score === 0) return null; // Reject if score is 0
+    if (score === 0) return null;
     possibleScore += WEIGHTS.price;
     actualScore += score;
+    breakdown.price = score;
   }
 
   // Size (SBA)
-  if (requirement.sba && property.sba) {
+  if (requirement.sba) {
+    if (property.sba == null) return null; // Reject: required, but missing
     const score = getSizeScore(requirement.sba, property.sba);
     if (score === 0) return null;
     possibleScore += WEIGHTS.size;
     actualScore += score;
+    breakdown.size = score;
   }
 
   // Configuration
-  if (requirement.config && property.config) {
+  if (requirement.config) {
+    if (!property.config) return null;
     const score = getConfigScore(requirement.config, property.config);
     if (score === 0) return null;
     possibleScore += WEIGHTS.config;
     actualScore += score;
+    breakdown.config = score;
   }
 
   // Asset Type
-  if (requirement.assetType && property.assetType) {
+  if (requirement.assetType) {
+    if (!property.assetType) return null;
     const score = getAssetTypeScore(requirement.assetType, property.assetType);
     if (score === 0) return null;
     possibleScore += WEIGHTS.assetType;
     actualScore += score;
+    breakdown.assetType = score;
   }
 
   // Location
-  if (requirement.locationName && property.latitude && property.longitude) {
+  if (requirement.locationName) {
+    if (property.latitude == null || property.longitude == null) return null;
     const score = getLocationScore(requirement.locationName, property.latitude, property.longitude);
     if (score === 0) return null;
     possibleScore += WEIGHTS.location;
     actualScore += score;
+    breakdown.location = score;
   }
 
   if (possibleScore === 0) return null;
 
-  const normalized = (actualScore / possibleScore) * 100;
-  return Math.round(normalized);
+  const total = (actualScore / possibleScore) * 100;
+
+  return {
+    total,
+    breakdown,
+    actualScore,
+    possibleScore,
+  };
 }
-
-
-/* usage for threshold 70
-const score = getMatchScore(requirement, property);
-if (score >= 70) {
-  console.log('✅ Good match:', score);
-} else {
-  console.log('❌ Not good enough:', score);
-}
-*/
-
-
-
-

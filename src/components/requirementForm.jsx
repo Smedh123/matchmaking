@@ -84,14 +84,13 @@ const RequirementForm = ({ onSubmit }) => {
           name="assetType"
           value={formData.assetType}
           onChange={handleChange}
-          className="w-full border px-2 py-1 rounded text-gray-700"
+          className="w-full border border-gray-300 px-2 py-1 rounded  focus:outline-none focus:ring-2 focus:text-gray-700"
         >
           <option value="">Select...</option>
           <option value="apartment">Apartment</option>
           <option value="independent building">Independent Building</option>
-          <option value="villa">Villa</option>
+          <option value="villa">Villament</option>
           <option value="row house">Row House</option>
-          <option value="villament">Villament</option>
           <option value="plot">Plot</option>
         </select>
       </div>
