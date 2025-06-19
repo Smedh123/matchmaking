@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getCoordinatesFromPlaceName } from "../helper/locationUtils";
 
 const RequirementForm = ({ onSubmit }) => {
   const [formData, setFormData] = useState({
@@ -15,18 +16,24 @@ const RequirementForm = ({ onSubmit }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const parsed = {
-      priceMin: Number(formData.budgetMin),
-      priceMax: Number(formData.budgetMax),
-      sba: Number(formData.minSBA),
-      config: formData.config,
-      assetType: formData.assetType,
-      locationName: formData.location,
-    };
-    onSubmit(parsed);
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const { lat, lng } = await getCoordinatesFromPlaceName(formData.location);
+
+  const parsed = {
+    priceMin: Number(formData.budgetMin),
+    priceMax: Number(formData.budgetMax),
+    sba: Number(formData.minSBA),
+    config: formData.config,
+    assetType: formData.assetType,
+    locationName: formData.location,
+    latitude: lat,
+    longitude: lng,
   };
+
+  onSubmit(parsed);
+};
 
   return (
     <form

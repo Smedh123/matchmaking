@@ -1,4 +1,4 @@
-import { getCoordinatesFromPlaceName, getDistanceFromLatLonInKm } from './locationUtils';
+import { getDistanceFromLatLonInKm } from './locationUtils';
 const MAX_DISTANCE_KM = 10;
 
 // Constants
@@ -63,16 +63,16 @@ function getAssetTypeScore(reqType, propType) {
     : 0;
 }
 
-export async function getLocationScore(reqLocationName, propLat, propLng) {
+export async function getLocationScore(reqLat, reqLng, propLat, propLng) {
   try {
-    const { lat: reqLat, lng: reqLng } = await getCoordinatesFromPlaceName(reqLocationName);
+    // const { lat: reqLat, lng: reqLng } = await getCoordinatesFromPlaceName(reqLocationName);
     if (!reqLat || !reqLng) return 0;
 
     const distance = await getDistanceFromLatLonInKm(reqLat, reqLng, propLat, propLng);
-
     if (distance >= MAX_DISTANCE_KM) return 0;
-
+    // console.log("Distance:", distance, "km");
     const ratio = 1 - (distance / MAX_DISTANCE_KM);
+    console.log("Location score:", Math.round(WEIGHTS.location * ratio));
     return Math.round(WEIGHTS.location * ratio);
   } catch (err) {
     console.error('Location scoring failed:', err);
@@ -80,7 +80,7 @@ export async function getLocationScore(reqLocationName, propLat, propLng) {
   }
 }
 
-export function getMatchScore(requirement, property) {
+export async function getMatchScore(requirement, property) {
   let actualScore = 0;
   let possibleScore = 0;
   const breakdown = {};
@@ -126,9 +126,10 @@ export function getMatchScore(requirement, property) {
   }
 
   // Location
-  if (requirement.locationName) {
+  if (requirement.latitude && requirement.longitude) {
     if (property.latitude == null || property.longitude == null) return null;
-    const score = getLocationScore(requirement.locationName, property.latitude, property.longitude);
+    const score = await getLocationScore(requirement.latitude, requirement.longitude, property.latitude, property.longitude);
+    // console.log("Location score:", score);
     if (score === 0) return null;
     possibleScore += WEIGHTS.location;
     actualScore += score;

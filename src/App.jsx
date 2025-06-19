@@ -20,26 +20,34 @@ function App() {
     fetchData();
   }, []);
 
-  const Matching = (requirement) => {
-  const matches = properties
-    .map((property) => {
-      const scoreResult = getMatchScore(requirement, property);
+  const Matching = async (requirement) => {
+    // Map properties to promises since getMatchScore is now async
+    const matchPromises = properties.map(async (property) => {
+      const scoreResult = await getMatchScore(requirement, property); // Await needed here
       return scoreResult !== null
         ? {
             id: property.id,
+            assetType: property.assetType || "Unknown",
             score: scoreResult.total,
             breakdown: scoreResult.breakdown,
             actualScore: scoreResult.actualScore,
             possibleScore: scoreResult.possibleScore,
           }
         : null;
-    })
-    .filter(Boolean);
+    });
 
-  const sorted = matches.sort((a, b) => b.score - a.score).slice(0, 50);
+    // Wait for all scores to resolve
+    const resolvedMatches = await Promise.all(matchPromises);
 
-  setRankedMatches(sorted);
-};
+    // Filter valid matches and sort
+    const sorted = resolvedMatches
+      .filter(Boolean)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 50);
+
+    setRankedMatches(sorted);
+  };
+
 
   const handleClick = async (match) => {
     console.log("Match details:", match);
