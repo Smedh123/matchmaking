@@ -31,7 +31,6 @@ function getSizeScore(reqSize, propSize) {
 
   // Linear scaling: closer = higher score
   const score = maxScore * (1 - diff / tolerance);
-    console.log("area score", score, "reqSize", reqSize, "propSize", propSize, "tolerance", tolerance, "diff", diff);
   return score; 
 }
 
@@ -54,7 +53,7 @@ function getPriceScore(reqMin, reqMax, propPrice) {
   const decayPower = 2;
   const score = maxScore * Math.pow(normalized, decayPower);
 
-  return Math.round(score);
+  return score;
 }
 
 function getAssetTypeScore(reqType, propType) {
@@ -65,15 +64,12 @@ function getAssetTypeScore(reqType, propType) {
 
 export async function getLocationScore(reqLat, reqLng, propLat, propLng) {
   try {
-    // const { lat: reqLat, lng: reqLng } = await getCoordinatesFromPlaceName(reqLocationName);
     if (!reqLat || !reqLng) return 0;
 
     const distance = await getDistanceFromLatLonInKm(reqLat, reqLng, propLat, propLng);
     if (distance >= MAX_DISTANCE_KM) return 0;
-    // console.log("Distance:", distance, "km");
     const ratio = 1 - (distance / MAX_DISTANCE_KM);
-    console.log("Location score:", Math.round(WEIGHTS.location * ratio));
-    return Math.round(WEIGHTS.location * ratio);
+    return WEIGHTS.location * ratio;
   } catch (err) {
     console.error('Location scoring failed:', err);
     return 0;
@@ -129,7 +125,6 @@ export async function getMatchScore(requirement, property) {
   if (requirement.latitude && requirement.longitude) {
     if (property.latitude == null || property.longitude == null) return null;
     const score = await getLocationScore(requirement.latitude, requirement.longitude, property.latitude, property.longitude);
-    // console.log("Location score:", score);
     if (score === 0) return null;
     possibleScore += WEIGHTS.location;
     actualScore += score;

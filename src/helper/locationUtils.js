@@ -10,7 +10,6 @@ export async function getCoordinatesFromPlaceName(micromarket) {
   const data = await response.json();
   if (data.results && data.results[0]) {
     const { lat, lng } = data.results[0].geometry.location;
-    // console.log(lat,lng);
     return { lat, lng };
   }
   return { lat: 0, lng: 0 };
