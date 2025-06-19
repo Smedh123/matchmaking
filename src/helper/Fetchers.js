@@ -8,18 +8,18 @@ export const fetchProperties = async () => {
       const data = doc.data();
 
       return {
-        id: data.propertyId || doc.id,             // Ensure fallback
-        price: Number(data.totalAskPrice),          // in Lakhs
-        sba: Number(data.sbua),                     // Super Built-up Area
-        config: data.unitType,                      // "2 BHK", "3 BHK"
-        assetType: data.assetType?.toLowerCase(),   // "apartment", "villa", etc.
-        locationName: data.micromarket,             // for geocoding if needed
+        id: data.propertyId || doc.id,
+        price: Number(data.totalAskPrice), // in Lakhs
+        sba: Number(data.sbua || data.plotSize), // Use sbua if available, else plotSize
+        config: data.unitType, // "2 BHK", "3 BHK"
+        assetType: data.assetType?.toLowerCase(),
+        locationName: data.micromarket,
         latitude: data._geoloc?.lat || null,
         longitude: data._geoloc?.lng || null,
 
-        // Optionally: keep original data for display
-        original: data
+        original: data,
       };
+
     });
 
     console.log('Normalized properties:', userData);

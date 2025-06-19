@@ -84,36 +84,52 @@ export function getMatchScore(requirement, property) {
   let actualScore = 0;
   let possibleScore = 0;
 
+  // Price
   if (requirement.priceMin && requirement.priceMax && property.price) {
+    const score = getPriceScore(requirement.priceMin, requirement.priceMax, property.price);
+    if (score === 0) return null; // Reject if score is 0
     possibleScore += WEIGHTS.price;
-    actualScore += getPriceScore(requirement.priceMin, requirement.priceMax, property.price);
+    actualScore += score;
   }
 
+  // Size (SBA)
   if (requirement.sba && property.sba) {
+    const score = getSizeScore(requirement.sba, property.sba);
+    if (score === 0) return null;
     possibleScore += WEIGHTS.size;
-    actualScore += getSizeScore(requirement.sba, property.sba);
+    actualScore += score;
   }
 
+  // Configuration
   if (requirement.config && property.config) {
+    const score = getConfigScore(requirement.config, property.config);
+    if (score === 0) return null;
     possibleScore += WEIGHTS.config;
-    actualScore += getConfigScore(requirement.config, property.config);
+    actualScore += score;
   }
 
+  // Asset Type
   if (requirement.assetType && property.assetType) {
+    const score = getAssetTypeScore(requirement.assetType, property.assetType);
+    if (score === 0) return null;
     possibleScore += WEIGHTS.assetType;
-    actualScore += getAssetTypeScore(requirement.assetType, property.assetType);
+    actualScore += score;
   }
 
+  // Location
   if (requirement.locationName && property.latitude && property.longitude) {
+    const score = getLocationScore(requirement.locationName, property.latitude, property.longitude);
+    if (score === 0) return null;
     possibleScore += WEIGHTS.location;
-    actualScore += getLocationScore(requirement.locationName, property.latitude, property.longitude);
+    actualScore += score;
   }
 
-  if (possibleScore === 0) return 0;
+  if (possibleScore === 0) return null;
 
   const normalized = (actualScore / possibleScore) * 100;
-  return Math.round(normalized); // return percentage
+  return Math.round(normalized);
 }
+
 
 /* usage for threshold 70
 const score = getMatchScore(requirement, property);

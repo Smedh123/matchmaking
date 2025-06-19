@@ -22,21 +22,24 @@ function App() {
   }, []);
 
   const Matching = (requirement) => {
-    const matches = properties.map((property) => {
-      const score = getMatchScore(requirement, property);
-      return {
-        id: property.id,
-        assetType: property.assetType || "Unknown",
-        score,
-      };
-    });
+    const matches = properties
+      .map((property) => {
+        const score = getMatchScore(requirement, property);
+        return score !== null
+          ? {
+              id: property.id,
+              assetType: property.assetType || "Unknown",
+              score,
+            }
+          : null;
+      })
+      .filter(Boolean);
 
-    const sorted = matches
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 50); // Limit to top 50
+    const sorted = matches.sort((a, b) => b.score - a.score).slice(0, 50); // Limit to top 50
 
     setRankedMatches(sorted);
   };
+
 
   const handleClick = async (id) => {
     const property = await fetchPropertyById(id);
