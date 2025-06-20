@@ -11,8 +11,8 @@ const WEIGHTS = {
 };
 
 function getConfigScore(reqConfig, propConfig) {
-  const reqNum = parseInt(reqConfig);   // e.g. "2 BHK" → 2
-  const propNum = parseInt(propConfig); // e.g. "3 BHK" → 3
+  const reqNum = parseFloat(reqConfig);   // e.g. "2 BHK" → 2
+  const propNum = parseFloat(propConfig); // e.g. "3 BHK" → 3
 
   if (isNaN(reqNum) || isNaN(propNum)) return 0;
 
