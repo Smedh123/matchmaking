@@ -1,11 +1,12 @@
 // import axios from 'axios';
 
 
-const apiKey = "AIzaSyCUPJQe9bZZ9aMowE_5gl9Qe19u5CE7egI";
+const placesApiKey = import.meta.env.VITE_PLACES_API_KEY;
+
 
 export async function getCoordinatesFromPlaceName(micromarket) {
   const response = await fetch(
-    `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(micromarket)}&key=${apiKey}`
+    `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(micromarket)}&key=${placesApiKey}`
   );
   const data = await response.json();
   if (data.results && data.results[0]) {
