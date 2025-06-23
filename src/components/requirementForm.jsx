@@ -9,6 +9,7 @@ const RequirementForm = ({ onSubmit }) => {
     config: "",
     assetType: "",
     location: "",
+    name: "",
   });
 
   const handleChange = (e) => {
@@ -30,6 +31,7 @@ const RequirementForm = ({ onSubmit }) => {
     locationName: formData.location,
     latitude: lat,
     longitude: lng,
+    PropertyName: formData.name,
   };
 
   onSubmit(parsed);
