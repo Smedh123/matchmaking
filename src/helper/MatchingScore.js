@@ -1,4 +1,5 @@
 import { getDistanceFromLatLonInKm } from './locationUtils';
+import { ratio } from 'fuzzball';
 const MAX_DISTANCE_KM = 10;
 
 // Constants
@@ -122,14 +123,38 @@ export async function getMatchScore(requirement, property) {
   }
 
   // Location
-  if (requirement.latitude && requirement.longitude) {
+  if (requirement.locationName && property.propertyName) {
+  const fuzzScore = ratio(requirement.locationName, property.propertyName);
+
+
+  if(fuzzScore >90) {
+  console.log(
+    `Fuzz match: "${requirement.locationName}" vs "${property.propertyName}" → ${fuzzScore}`
+  );}
+
+  const isNameMatch = fuzzScore >= 90;
+
+  if (isNameMatch) {
+    // Give full location score
+    possibleScore += WEIGHTS.location;
+    actualScore += WEIGHTS.location;
+    breakdown.location = WEIGHTS.location;
+  } else if (requirement.latitude && requirement.longitude) {
+    // Do distance-based scoring
     if (property.latitude == null || property.longitude == null) return null;
-    const score = await getLocationScore(requirement.latitude, requirement.longitude, property.latitude, property.longitude);
+    const score = await getLocationScore(
+      requirement.latitude,
+      requirement.longitude,
+      property.latitude,
+      property.longitude
+    );
     if (score === 0) return null;
     possibleScore += WEIGHTS.location;
     actualScore += score;
     breakdown.location = score;
   }
+}
+
 
   if (possibleScore === 0) return null;
 

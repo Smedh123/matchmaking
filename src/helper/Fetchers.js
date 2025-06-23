@@ -16,7 +16,7 @@ export const fetchProperties = async () => {
         locationName: data.micromarket,
         latitude: data._geoloc?.lat || null,
         longitude: data._geoloc?.lng || null,
-
+        propertyName: data.nameOfTheProperty || null,
         original: data,
       };
 

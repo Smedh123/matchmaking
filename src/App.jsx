@@ -20,33 +20,36 @@ function App() {
     fetchData();
   }, []);
 
-  const Matching = async (requirement) => {
-    // Map properties to promises since getMatchScore is now async
-    const matchPromises = properties.map(async (property) => {
-      const scoreResult = await getMatchScore(requirement, property); // Await needed here
-      return scoreResult !== null
-        ? {
-            id: property.id,
-            assetType: property.assetType || "Unknown",
-            score: scoreResult.total,
-            breakdown: scoreResult.breakdown,
-            actualScore: scoreResult.actualScore,
-            possibleScore: scoreResult.possibleScore,
-          }
-        : null;
-    });
+const THRESHOLD = 80; 
 
-    // Wait for all scores to resolve
-    const resolvedMatches = await Promise.all(matchPromises);
+const Matching = async (requirement) => {
+  const matchPromises = properties.map(async (property) => {
+    const scoreResult = await getMatchScore(requirement, property);
 
-    // Filter valid matches and sort
-    const sorted = resolvedMatches
-      .filter(Boolean)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 50);
+    if (scoreResult && scoreResult.total >= THRESHOLD) {
+      return {
+        id: property.id,
+        assetType: property.assetType || "Unknown",
+        score: scoreResult.total,
+        breakdown: scoreResult.breakdown,
+        actualScore: scoreResult.actualScore,
+        possibleScore: scoreResult.possibleScore,
+      };
+    }
 
-    setRankedMatches(sorted);
-  };
+    return null;
+  });
+
+  const resolvedMatches = await Promise.all(matchPromises);
+
+  const sorted = resolvedMatches
+    .filter(Boolean)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 50);
+
+  setRankedMatches(sorted);
+};
+
 
 
   const handleClick = async (match) => {
