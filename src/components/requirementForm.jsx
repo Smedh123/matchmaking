@@ -113,6 +113,17 @@ const RequirementForm = ({ onSubmit }) => {
           className="w-full border px-2 py-1 rounded"
         />
       </div>
+      <div>
+        <label className="block text-sm font-medium">Property Name</label>
+        <input
+          type="text"
+          name="location"
+          placeholder="e.g. Whitefield"
+          value={formData.name}
+          onChange={handleChange}
+          className="w-full border px-2 py-1 rounded"
+        />
+      </div>
 
       <button
         type="submit"
