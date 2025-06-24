@@ -115,7 +115,7 @@ const RequirementForm = ({ onSubmit }) => {
           className="w-full border px-2 py-1 rounded"
         />
       </div>
-      <div>
+      {/* <div>
         <label className="block text-sm font-medium">Property Name</label>
         <input
           type="text"
@@ -125,7 +125,7 @@ const RequirementForm = ({ onSubmit }) => {
           onChange={handleChange}
           className="w-full border px-2 py-1 rounded"
         />
-      </div>
+      </div> */}
 
       <button
         type="submit"
